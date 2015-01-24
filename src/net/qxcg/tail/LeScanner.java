@@ -28,6 +28,7 @@ public class LeScanner {
 	private BluetoothAdapter bta;
 	private boolean btaScanning;
 	private Set<LeDeviceInfo> seen;
+	private LeScanCallback scanCallback;
 
 	static {
 		instance = null;
@@ -44,6 +45,14 @@ public class LeScanner {
 	private LeScanner() {
 		bta = BluetoothAdapter.getDefaultAdapter();
 		seen = new HashSet<>();
+		scanCallback = new LeScanCallback() {
+			@Override
+			public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+				LeDeviceInfo dev = new LeDeviceInfo(device.getName(), device
+						.getAddress(), System.currentTimeMillis(), rssi);
+				updateSeen(dev);
+			}
+		};
 
 		btaScanning = false;
 	}
@@ -59,15 +68,7 @@ public class LeScanner {
 		Timer terminationTimer = new Timer();
 
 		btaScanning = true;
-		bta.startLeScan(new LeScanCallback() {
-			@Override
-			public void onLeScan(BluetoothDevice device, int rssi,
-					byte[] scanRecord) {
-				LeDeviceInfo dev = new LeDeviceInfo(device.getName(), device
-						.getAddress(), System.currentTimeMillis(), rssi);
-				updateSeen(dev);
-			}
-		});
+		bta.startLeScan(scanCallback);
 
 		terminationTimer.schedule(new TimerTask() {
 			@Override
@@ -92,13 +93,7 @@ public class LeScanner {
 			return false;
 		}
 
-		bta.stopLeScan(new LeScanCallback() {
-			@Override
-			public void onLeScan(BluetoothDevice device, int rssi,
-					byte[] scanRecord) {
-				// Do nothing.
-			}
-		});
+		bta.stopLeScan(scanCallback);
 		btaScanning = false;
 
 		return true;
