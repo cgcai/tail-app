@@ -1,8 +1,6 @@
 package net.qxcg.tail;
 
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -21,7 +19,7 @@ public class MainActivity extends Activity {
 	private final static int INITIAL_DELAY = 1000;
 	private final static int SCAN_INTERVAL = 20000;
 	private final static int SCAN_DURATION = 5000;
-	
+
 	private ScheduledThreadPoolExecutor threadPool = null;
 
 	@Override
@@ -49,22 +47,16 @@ public class MainActivity extends Activity {
 		threadPool.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
-				LeScanner.getInstance().startScan();
-				Timer timer = new Timer();
-				timer.schedule(new TimerTask() {
+				LeScanner.getInstance().doScan(SCAN_DURATION, new LeScannerResultsCallback() {
 					@Override
-					public void run() {
-						LeScanner.getInstance().stopScan();
-
-						Set<LeDeviceInfo> seen = LeScanner.getInstance()
-								.getDiscoveredDevices();
-						processDiscoveredDevices(seen);
+					public void onScanComplete(Set<LeDeviceInfo> devices) {
+						processDiscoveredDevices(devices);
 					}
-				}, SCAN_DURATION);
+				});
 			}
 		}, INITIAL_DELAY, SCAN_INTERVAL, TimeUnit.MILLISECONDS);
 	}
-	
+
 	private void processDiscoveredDevices(Set<LeDeviceInfo> devices) {
 		StringBuilder sb = new StringBuilder();
 		for (LeDeviceInfo dev : devices) {
@@ -72,15 +64,15 @@ public class MainActivity extends Activity {
 			sb.append("\n");
 		}
 		final String text = sb.toString();
-		
+
 		new Handler(Looper.getMainLooper()).post(new Runnable() {
 			@Override
 			public void run() {
-				TextView tv = (TextView)findViewById(R.id.textView1);
+				TextView tv = (TextView) findViewById(R.id.textView1);
 				tv.setText(text);
 			}
 		});
-		
+
 	}
 
 	@Override
