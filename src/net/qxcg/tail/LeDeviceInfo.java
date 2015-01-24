@@ -50,6 +50,19 @@ public class LeDeviceInfo {
 	public int getRssi() {
 		return rssi;
 	}
+	
+	/**
+	 * Gets a metric representing the proximity of the LE device to this radio.
+	 * 
+	 * This metric is correlated with distance, but is _not_ a measure of distance.
+	 * 
+	 * Larger values => further.
+	 * @return
+	 */
+	public int getProximityMetric() {
+		// Negate RSSI value so that larger values represent more distant LE devices.
+		return -1 * rssi;
+	}
 
 	@Override
 	public String toString() {
