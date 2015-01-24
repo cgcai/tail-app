@@ -17,8 +17,8 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 	// Delays (ms)
 	private final static int INITIAL_DELAY = 1000;
-	private final static int SCAN_INTERVAL = 20000;
-	private final static int SCAN_DURATION = 5000;
+	private final static int SCAN_INTERVAL = 5000;
+	private final static int SCAN_DURATION = 1000;
 
 	private ScheduledThreadPoolExecutor threadPool = null;
 
